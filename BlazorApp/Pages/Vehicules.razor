@@ -1,0 +1,52 @@
+﻿@page "/vehicules"
+@using BlazorApp.Services
+@using BlazorApp.Models.Domain
+@using BlazorApp.Dto
+@inject VehiculeService VehiculeService
+@inject ReservationService ReservationService
+
+<h1>Vehicules</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Borne</th>
+        <th>Véhicule</th>
+        <th>Catégorie</th>
+        <th>Batterie</th>
+        <th>Disponibilité</th>
+        <th>Réserver</th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (Vehicule vehicule in VehiculeService.VehiculesAReserver())
+        {
+            <tr>
+                <td>@("inconnu")</td>
+                <td>@(vehicule.TypeVehiculeNavigation.TypeVehicule1)</td>
+                <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
+                <td>@(vehicule.EtatBatterie)</td>
+                <td>@(vehicule.Disponibilite)</td>
+                <td>
+                    <button @onclick="() => Callback(vehicule)">
+                        Réserver
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private void Callback(Vehicule vehicule)
+    {
+        Console.WriteLine(vehicule.IdVehicule);
+        ReservationService.Reserver(vehicule, new Client(){IdClient = 1}, new PlageReservation()
+        {
+            start = DateTime.Now,
+            end = DateTime.Now + TimeSpan.FromDays(1)
+        });
+    }
+
+}

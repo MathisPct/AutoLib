@@ -1,0 +1,61 @@
+﻿@page "/register"
+@using BlazorApp.Services
+@using BlazorApp.Dto
+@inject AuthentificationService AuthService
+@inject NavigationManager NavigationManager
+
+<h1>S'enregistrer</h1>
+<EditForm Model="@_userRegistration" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="Prenom">Prénom: </label>
+        <InputText id="Prenom" class="form-control" @bind-Value="_userRegistration.Prenom" />
+        <ValidationMessage For="@(() => _userRegistration.Prenom)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Nom">Nom: </label>
+        <InputText id="Nom" class="form-control" @bind-Value="_userRegistration.Nom" />
+        <ValidationMessage For="@(() => _userRegistration.Nom)" />
+    </div>
+
+    <div class="form-group">
+        <label for="DateNaissance">Date d'anniversaire</label>
+        <InputDate id="DateNaissance" class="form-control" @bind-Value="_userRegistration.DateNaissance" />
+        <ValidationMessage For="@(() => _userRegistration.DateNaissance)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Password:</label>
+        <InputText type="password" id="Password" class="form-control" @bind-Value="_userRegistration.Password" />
+        <ValidationMessage For="@(() => _userRegistration.Password)" />
+    </div>
+
+    <div class="signin-container">
+        <button style="margin-top: 20px" type="submit" class="btn btn-primary">S'enregistrer</button>
+    </div>
+    @if (_errorMessage != null)
+    {
+        <div class="alert alert-danger mt-3">@_errorMessage</div>
+    }
+</EditForm>
+
+@code {
+    private UserRegistration _userRegistration = new();
+    private string _errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var newUser = await AuthService.Register(_userRegistration, CancellationToken.None);
+            // Handle successful registration, e.g. redirect to the homepage or login page
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+}

@@ -1,0 +1,33 @@
+﻿@using BlazorApp.Services
+@using BlazorApp.Models.Domain
+@using BlazorApp.Repository
+@inject StationService StationService
+@inject IJSRuntime JsRuntime
+
+<h3>Stations</h3>
+<div id="@mapId" style="width: 100%; height: 400px;"></div>
+
+@code {
+    private List<Station> stations;
+    private string mapId = "map-" + totalMap;
+    private static int totalMap = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        totalMap++;
+        stations = StationService.Stations();
+        return Task.CompletedTask;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("initializeLeafletMap", mapId);
+            foreach (var station in stations)
+            {
+                await JsRuntime.InvokeVoidAsync("addMarkerToMap", mapId, station.IdStation ,station.Latitude, station.Longitude, station.Adresse, station.TotalVoitures, station.TotalPlacesParking);
+            }
+        }
+    }
+}

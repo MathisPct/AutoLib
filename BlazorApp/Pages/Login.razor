@@ -1,0 +1,46 @@
+﻿@page "/login"
+@using BlazorApp.Dto
+@using BlazorApp.Services
+@inject AuthentificationService AuthService
+@inject NavigationManager NavigationManager
+
+<h1>Se connecter</h1>
+
+<EditForm Model="@_loginData" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator/>
+    
+    <div class="form-group">
+        <label for="prenom">Prénom</label>
+        <InputText id="prenom" class="form-control" @bind-Value="_loginData.Email"></InputText>
+    </div>
+    
+    <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <InputText type="password" id="password" class="form-control" @bind-Value="_loginData.Password"></InputText>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Se connecter</button>
+    
+    @if (_errorMessage != null)
+    {
+        <div class="alert alert-danger mt-3">@_errorMessage</div>
+    }
+</EditForm>
+
+@code {
+    private LoginData _loginData = new();
+    private string _errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var connectedUser = await AuthService.Login(_loginData, CancellationToken.None);
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+}
