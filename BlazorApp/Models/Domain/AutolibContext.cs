@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorApp.Models.Domain;
 
-public partial class AutolibContext : DbContext
+public partial class AutolibContext : IdentityDbContext
 {
     public AutolibContext()
     {
