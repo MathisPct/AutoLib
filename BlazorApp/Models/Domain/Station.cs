@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorApp.Models.Domain;
 
+[Table("Station")]
 public partial class Station
 {
+    [Key]
     public int IdStation { get; set; }
 
     public decimal Latitude { get; set; }

@@ -1,6 +1,8 @@
+using BlazorApp.Middleware;
 using BlazorApp.Models.Domain;
 using BlazorApp.Repository;
 using BlazorApp.Services;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,9 @@ builder.Services.AddSingleton<VehiculeRepository>();
 builder.Services.AddSingleton<VehiculeService>();
 builder.Services.AddSingleton<ReservationRepository>();
 builder.Services.AddSingleton<ReservationService>();
-builder.Services.AddSingleton<AuthentificationService>();
+
+builder.Services.AddIdentity<Client, IdentityRole>()
+    .AddEntityFrameworkStores<AutolibContext>();
 
 var app = builder.Build();
 
@@ -31,6 +35,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseMiddleware<BlazorCookieLoginMiddleware>();
+app.UseMiddleware<LogoutMiddleware>();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

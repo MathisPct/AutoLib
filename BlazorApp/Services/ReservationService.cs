@@ -15,7 +15,6 @@ public class ReservationService
 
     public void Reserver(Vehicule vehicule, Client client, PlageReservation plageReservation)
     {
-        // TODO: gérer l'authent
         vehicule.Reserver(client, plageReservation);
         _vehiculeRepository.Update();
     }

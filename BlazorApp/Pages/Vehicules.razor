@@ -2,51 +2,69 @@
 @using BlazorApp.Services
 @using BlazorApp.Models.Domain
 @using BlazorApp.Dto
+@using Microsoft.AspNetCore.Identity
 @inject VehiculeService VehiculeService
 @inject ReservationService ReservationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<Client> UserManager
 
-<h1>Vehicules</h1>
-
-<table>
-    <thead>
-    <tr>
-        <th>Borne</th>
-        <th>Véhicule</th>
-        <th>Catégorie</th>
-        <th>Batterie</th>
-        <th>Disponibilité</th>
-        <th>Réserver</th>
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (Vehicule vehicule in VehiculeService.VehiculesAReserver())
-        {
+<AuthorizeView>
+    <Authorized>
+        <h1>Vehicules</h1>
+        
+        <table>
+            <thead>
             <tr>
-                <td>@("inconnu")</td>
-                <td>@(vehicule.TypeVehiculeNavigation.TypeVehicule1)</td>
-                <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
-                <td>@(vehicule.EtatBatterie)</td>
-                <td>@(vehicule.Disponibilite)</td>
-                <td>
-                    <button @onclick="() => Callback(vehicule)">
-                        Réserver
-                    </button>
-                </td>
+                <th>Borne</th>
+                <th>Véhicule</th>
+                <th>Catégorie</th>
+                <th>Batterie</th>
+                <th>Disponibilité</th>
+                <th>Réserver</th>
             </tr>
+            </thead>
+            <tbody>
+            @foreach (Vehicule vehicule in VehiculeService.VehiculesAReserver())
+            {
+                <tr>
+                    <td>@("inconnu")</td>
+                    <td>@(vehicule.TypeVehiculeNavigation.Name)</td>
+                    <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
+                    <td>@(vehicule.EtatBatterie)</td>
+                    <td>@(vehicule.Disponibilite)</td>
+                    <td>
+                        <button @onclick="() => Reserver(vehicule)">
+                            Réserver
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        
+        @code {
+        
+            private async void Reserver(Vehicule vehicule)
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+                if (user.Identity == null || user.Identity.IsAuthenticated == false)
+                {
+                    throw new Exception("Vous devez être connecté pour réserver un véhicule");
+                }
+                
+                var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user.Identity.Name) ?? throw new Exception("Vous devez être connecté pour réserver un véhicule");;
+
+                ReservationService.Reserver(vehicule, clientConnected, new PlageReservation()
+                {
+                    start = DateTime.Now,
+                    end = DateTime.Now + TimeSpan.FromDays(1)
+                });
+            }
+        
         }
-    </tbody>
-</table>
-
-@code {
-
-    private void Callback(Vehicule vehicule)
-    {
-        Console.WriteLine(vehicule.IdVehicule);
-        ReservationService.Reserver(vehicule, new Client(){IdClient = 1}, new PlageReservation()
-        {
-            start = DateTime.Now,
-            end = DateTime.Now + TimeSpan.FromDays(1)
-        });
-    }
-
-}
+    </Authorized>
+    <NotAuthorized>
+        <p>Veuillez vous connecter pour voir ce contenu.</p>
+    </NotAuthorized>
+</AuthorizeView>
