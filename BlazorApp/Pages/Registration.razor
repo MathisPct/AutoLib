@@ -22,6 +22,12 @@
     </div>
 
     <div class="form-group">
+        <label for="email">Email: </label>
+        <InputText id="email" class="form-control" @bind-Value="_userRegistration.Email"/>
+        <ValidationMessage For="@(() => _userRegistration.Email)"/>
+    </div>
+
+    <div class="form-group">
         <label for="DateNaissance">Date d'anniversaire</label>
         <InputDate id="DateNaissance" class="form-control" @bind-Value="_userRegistration.DateNaissance"/>
         <ValidationMessage For="@(() => _userRegistration.DateNaissance)"/>
@@ -50,7 +56,7 @@
 
 @code {
     private UserRegistration _userRegistration = new();
-    
+
     protected override void OnInitialized()
     {
         _userRegistration = new UserRegistration()
@@ -60,7 +66,7 @@
             RequireDigit = UserManager.Options.Password.RequireDigit,
         };
     }
-    
+
     private string _errorMessage;
 
     private async Task HandleValidSubmit()
@@ -69,18 +75,16 @@
         {
             var user = new Client()
             {
-                UserName = _userRegistration.Prenom,
+                UserName = _userRegistration.Nom.ToUpper() + " " + _userRegistration.Prenom,
                 Prenom = _userRegistration.Prenom,
                 Nom = _userRegistration.Nom,
                 DateNaissance = _userRegistration.DateNaissance,
-                Email = _userRegistration.Prenom
+                Email = _userRegistration.Email
             };
             var identityResult = await UserManager.CreateAsync(user, _userRegistration.Password);
             if (identityResult.Succeeded == false)
             {
-                foreach (var identityResultError in identityResult.Errors)
-                {
-                }
+                throw new Exception("Le compte n'a pas pu être créé, veuillez vérifier les informations saisies");
             }
             NavigationManager.NavigateTo("/login");
         }
@@ -89,4 +93,5 @@
             _errorMessage = ex.Message;
         }
     }
+
 }

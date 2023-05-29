@@ -30,6 +30,10 @@ public record UserRegistration()
     
     public bool RequireNonAlphaNumeric { get; init; }
     public bool RequireDigit { get; set; }
+    
+    [Required(ErrorMessage = "L'email est obligatoire.")]
+    [EmailAddress(ErrorMessage = "L'email n'est pas valide.")]
+    public string Email { get; set; }
 
     public static ValidationResult? ValidatePasswordLength(string password, ValidationContext context)
     {
