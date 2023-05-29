@@ -1,0 +1,55 @@
+﻿@page "/myreservation"
+@using BlazorApp.Services
+@using Microsoft.AspNetCore.Identity
+@using BlazorApp.Models.Domain
+@inject ReservationService ReservationService;
+@inject UserManager<Client> UserManager
+@inject SignInManager<Client> SignInManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h1>Mes réservations</h1>
+@if (_errorMessage == null)
+{
+    <table>
+        <thead>
+        <th>Date échéance</th>
+        <th>Véhicule</th>
+        </thead>
+    
+        <tbody>
+        @foreach (var reservation in _reservations)
+        {
+            <tr>
+                <td>@reservation.DateEcheance</td>
+                <td>@reservation.Vehicule.TypeVehiculeNavigation.Name</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @_errorMessage
+    </div>
+}
+
+@code {
+    private string? _errorMessage;
+    private List<Reservation> _reservations;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var clientConnected = UserManager.Users.FirstOrDefault(u => u.UserName == user.Identity.Name) ?? throw new Exception("Vous devez être connectée");
+            this._reservations = ReservationService.Reservations(clientConnected);
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+        }
+    }
+}

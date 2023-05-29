@@ -15,4 +15,9 @@ public class ReservationRepository
     {
         _autolibContext.Reservations.Add(reservation);
     }
+
+    public List<Reservation> Reservations(Client client)
+    {
+        return _autolibContext.Reservations.Where(r => r.ClientId == client.Id).ToList();
+    }
 }

@@ -1,0 +1,154 @@
+﻿@page "/account"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using BlazorApp.Models.Domain
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Client> UserManager
+@inject SignInManager<Client> SignInManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<h1>Mes informations personneles</h1>
+<EditForm Model="@userModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <div class="form-group">
+        <label for="firstName">Mon prénom</label>
+        <InputText id="firstName" class="form-control" @bind-Value="userModel.FirstName" placeholder="First Name"/>
+        <ValidationMessage For="@(() => userModel.FirstName)"/>
+    </div>
+
+    <div class="form-group">
+        <label for="lastName">Mon nom</label>
+        <InputText id="lastName" class="form-control" @bind-Value="userModel.LastName" placeholder="Last Name"/>
+        <ValidationMessage For="@(() => userModel.LastName)"/>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Mon email</label>
+        <InputText id="email" class="form-control" @bind-Value="userModel.Email" placeholder="Email"/>
+        <ValidationMessage For="@(() => userModel.Email)"/>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Mon mot de passe</label>
+        <InputText id="password" class="form-control" @bind-Value="userModel.Password" placeholder="Password" type="password"/>
+        <ValidationMessage For="@(() => userModel.Password)"/>
+    </div>
+    
+    <div class="button-right-form">
+        <button type="submit" class="btn btn-primary">Enregistrer mes informations</button>
+    </div>
+</EditForm>
+
+@if (_errorMessage != null)
+{
+    <div class="alert alert-danger mt-3">@_errorMessage</div>
+}
+@if (_updated == true)
+{
+    <div class="alert alert-success" role="alert">L'utilisateur a été modifié</div>
+}
+
+@code {
+    private UserModel userModel;
+
+    private string _errorMessage;
+
+    private bool _updated = false;
+
+    protected override async void OnInitialized()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        try
+        {
+            if (user.Identity == null || user.Identity.IsAuthenticated == false)
+            {
+                throw new Exception("Vous devez être connecté pour réserver un véhicule");
+            }
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+        }
+
+        var clientConnected = UserManager.Users.FirstOrDefault(u => u.UserName == user.Identity.Name) ?? throw new Exception("Vous devez être connectée");
+
+        userModel = new UserModel
+        {
+            FirstName = clientConnected.Nom,
+            LastName = clientConnected.Prenom,
+            Email = clientConnected.Email,
+            Password = String.Empty
+        };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        ClaimsPrincipal user = null;
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            user = authState.User;
+            if (user.Identity == null || user.Identity.IsAuthenticated == false)
+            {
+                throw new Exception("Vous devez être connecté");
+            }
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+        }
+
+        var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user!.Identity!.Name) ?? throw new Exception("Vous devez être connectée");
+
+        clientConnected.Nom = userModel.FirstName;
+        clientConnected.Prenom = userModel.LastName;
+        clientConnected.Email = userModel.Email;
+        clientConnected.UserName = userModel.Email;
+
+        try
+        {
+            var result = await UserManager.UpdateAsync(clientConnected);
+
+            if (result.Succeeded == false) throw new Exception("Erreur lors de la mise à jour du profil");
+
+
+            if (!String.IsNullOrEmpty(userModel.Password))
+            {
+                var token = await UserManager.GeneratePasswordResetTokenAsync(clientConnected);
+                var passwordResult = await UserManager.ResetPasswordAsync(clientConnected, token, userModel.Password);
+
+                if (!passwordResult.Succeeded)
+                {
+                    throw new Exception("Erreur lors de la mise à jour du mot de passe");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+        }
+
+        _updated = true;
+    }
+
+    public class UserModel
+    {
+        [Required]
+        public string FirstName { get; set; }
+
+        [Required]
+        public string LastName { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        public string Password { get; set; }
+    }
+
+}
