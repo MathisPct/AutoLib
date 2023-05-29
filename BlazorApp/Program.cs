@@ -2,7 +2,6 @@ using BlazorApp.Middleware;
 using BlazorApp.Models.Domain;
 using BlazorApp.Repository;
 using BlazorApp.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
