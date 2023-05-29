@@ -2,6 +2,7 @@
 
 namespace BlazorApp.Models.Domain;
 
+[Table("Reservation")]
 public class Reservation
 {
     public int Vehicule { get; set; }

@@ -75,7 +75,7 @@
         {
             var user = new Client()
             {
-                UserName = _userRegistration.Nom.ToUpper() + " " + _userRegistration.Prenom,
+                UserName = _userRegistration.Email,
                 Prenom = _userRegistration.Prenom,
                 Nom = _userRegistration.Nom,
                 DateNaissance = _userRegistration.DateNaissance,
@@ -91,6 +91,7 @@
         catch (Exception ex)
         {
             _errorMessage = ex.Message;
+            Console.Error.Write(ex);
         }
     }
 

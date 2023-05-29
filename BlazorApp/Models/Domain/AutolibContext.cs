@@ -14,22 +14,22 @@ public partial class AutolibContext : IdentityDbContext<Client>
     {
     }
 
-    public virtual DbSet<Borne> Bornes { get; set; }
+    public DbSet<Borne> Bornes { get; set; }
 
-    public virtual DbSet<Client> Clients { get; set; }
+    public DbSet<Client> Clients { get; set; }
 
-    public virtual DbSet<Reservation> Reservations { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
 
-    public virtual DbSet<Station> Stations { get; set; }
+    public DbSet<Station> Stations { get; set; }
 
-    public virtual DbSet<TypeVehicule> TypeVehicules { get; set; }
+    public DbSet<TypeVehicule> TypeVehicules { get; set; }
 
-    public virtual DbSet<UtilisationVehicule> Utilises { get; set; }
+    public DbSet<UtilisationVehicule> Utilises { get; set; }
 
-    public virtual DbSet<Vehicule> Vehicules { get; set; }
+    public DbSet<Vehicule> Vehicules { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseInMemoryDatabase("autolib");
+        optionsBuilder.UseMySQL("server=localhost;port=3306;user=root;password=;database=autolib2");
     }
 }

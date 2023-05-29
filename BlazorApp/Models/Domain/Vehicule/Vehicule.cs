@@ -7,6 +7,7 @@ using BlazorApp.Models.Exception;
 
 namespace BlazorApp.Models.Domain;
 
+[Table("Vehicule")]
 public partial class Vehicule
 {
     [Key]

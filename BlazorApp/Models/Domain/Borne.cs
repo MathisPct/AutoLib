@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorApp.Models.Domain;
 
-
+[Table("Borne")]
 public class Borne
 {
     [Key]
@@ -12,11 +12,7 @@ public class Borne
     /// <summary>
     /// True si la station est libre
     /// </summary>
-    [Column(TypeName = "bool")]
     public bool IsFree { get; set; }
-    
-    [Column(TypeName = "int")]
-    public int Station { get; set; }
 
     [Column(TypeName = "int")]
     public int? IdVehicule { get; set; }

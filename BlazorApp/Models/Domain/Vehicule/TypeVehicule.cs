@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorApp.Models.Domain;
 
+[Table("TypeVehicule")]
 public partial class TypeVehicule
 {
     [Key]

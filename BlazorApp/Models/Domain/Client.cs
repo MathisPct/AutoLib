@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlazorApp.Models.Domain;
 
+[Table("Client")]
 public partial class Client : IdentityUser
 {
     public string Nom { get; set; } = null!;
