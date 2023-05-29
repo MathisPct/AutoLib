@@ -2,8 +2,11 @@
 @using BlazorApp.Services
 @using BlazorApp.Models.Domain
 @using BlazorApp.Dto
+@using Microsoft.AspNetCore.Identity
 @inject VehiculeService VehiculeService
 @inject ReservationService ReservationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<Client> UserManager
 
 <AuthorizeView>
     <Authorized>
@@ -25,12 +28,12 @@
             {
                 <tr>
                     <td>@("inconnu")</td>
-                    <td>@(vehicule.TypeVehiculeNavigation.TypeVehicule1)</td>
+                    <td>@(vehicule.TypeVehiculeNavigation.Name)</td>
                     <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
                     <td>@(vehicule.EtatBatterie)</td>
                     <td>@(vehicule.Disponibilite)</td>
                     <td>
-                        <button @onclick="() => Callback(vehicule)">
+                        <button @onclick="() => Reserver(vehicule)">
                             Réserver
                         </button>
                     </td>
@@ -41,10 +44,18 @@
         
         @code {
         
-            private void Callback(Vehicule vehicule)
+            private async void Reserver(Vehicule vehicule)
             {
-                Console.WriteLine(vehicule.IdVehicule);
-                ReservationService.Reserver(vehicule, new Client(), new PlageReservation()
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+                if (user.Identity == null || user.Identity.IsAuthenticated == false)
+                {
+                    throw new Exception("Vous devez être connecté pour réserver un véhicule");
+                }
+                
+                var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user.Identity.Name) ?? throw new Exception("Vous devez être connecté pour réserver un véhicule");;
+
+                ReservationService.Reserver(vehicule, clientConnected, new PlageReservation()
                 {
                     start = DateTime.Now,
                     end = DateTime.Now + TimeSpan.FromDays(1)

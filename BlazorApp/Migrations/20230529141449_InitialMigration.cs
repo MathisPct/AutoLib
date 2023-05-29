@@ -6,7 +6,7 @@ using MySql.EntityFrameworkCore.Metadata;
 
 namespace BlazorApp.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -83,7 +83,7 @@ namespace BlazorApp.Migrations
                     IdTypeVehicule = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     Categorie = table.Column<string>(type: "longtext", nullable: false),
-                    TypeVehicule1 = table.Column<string>(type: "longtext", nullable: false)
+                    Name = table.Column<string>(type: "longtext", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -234,7 +234,6 @@ namespace BlazorApp.Migrations
                     IdBorne = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     IsFree = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Station = table.Column<int>(type: "int", nullable: false),
                     IdVehicule = table.Column<int>(type: "int", nullable: true),
                     IdStation = table.Column<int>(type: "int", nullable: false)
                 },
@@ -259,24 +258,23 @@ namespace BlazorApp.Migrations
                 name: "Reservation",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false),
-                    Vehicule = table.Column<int>(type: "int", nullable: false),
                     DateReservation = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    DateEcheance = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    IdVehicule = table.Column<int>(type: "int", nullable: false)
+                    ClientId = table.Column<string>(type: "varchar(255)", nullable: false),
+                    VehiculeId = table.Column<int>(type: "int", nullable: false),
+                    DateEcheance = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservation", x => x.Id);
+                    table.PrimaryKey("PK_Reservation", x => new { x.DateReservation, x.ClientId, x.VehiculeId });
                     table.ForeignKey(
-                        name: "FK_Reservation_AspNetUsers_Id",
-                        column: x => x.Id,
+                        name: "FK_Reservation_AspNetUsers_ClientId",
+                        column: x => x.ClientId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reservation_Vehicule_IdVehicule",
-                        column: x => x.IdVehicule,
+                        name: "FK_Reservation_Vehicule_VehiculeId",
+                        column: x => x.VehiculeId,
                         principalTable: "Vehicule",
                         principalColumn: "IdVehicule",
                         onDelete: ReferentialAction.Cascade);
@@ -372,9 +370,14 @@ namespace BlazorApp.Migrations
                 column: "IdVehicule");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservation_IdVehicule",
+                name: "IX_Reservation_ClientId",
                 table: "Reservation",
-                column: "IdVehicule");
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservation_VehiculeId",
+                table: "Reservation",
+                column: "VehiculeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UtilisationVehicule_BorneArrivee",

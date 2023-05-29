@@ -13,6 +13,14 @@ public partial class AutolibContext : IdentityDbContext<Client>
         : base(options)
     {
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<Reservation>()
+            .HasKey(r => new { r.DateReservation, r.ClientId, r.VehiculeId });
+    }
 
     public DbSet<Borne> Bornes { get; set; }
 

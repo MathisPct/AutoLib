@@ -46,8 +46,8 @@ public partial class Vehicule
         
         Reservation reservation = new Reservation()
         {
-            ClientNavigation = client,
-            Vehicule = this.IdVehicule,
+            Client = client,
+            Vehicule = this,
             DateReservation = plageReservation.start,
             DateEcheance = plageReservation.end
         };

@@ -11,7 +11,7 @@ public partial class TypeVehicule
 
     public string Categorie { get; set; } = null!;
 
-    public string TypeVehicule1 { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     public virtual ICollection<Vehicule> Vehicules { get; set; } = new List<Vehicule>();
 }

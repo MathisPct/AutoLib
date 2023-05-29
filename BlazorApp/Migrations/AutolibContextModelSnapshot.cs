@@ -120,24 +120,23 @@ namespace BlazorApp.Migrations
 
             modelBuilder.Entity("BlazorApp.Models.Domain.Reservation", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<DateTime>("DateReservation")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ClientId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int>("VehiculeId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("DateEcheance")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("DateReservation")
-                        .HasColumnType("datetime(6)");
+                    b.HasKey("DateReservation", "ClientId", "VehiculeId");
 
-                    b.Property<int>("IdVehicule")
-                        .HasColumnType("int");
+                    b.HasIndex("ClientId");
 
-                    b.Property<int>("Vehicule")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdVehicule");
+                    b.HasIndex("VehiculeId");
 
                     b.ToTable("Reservation");
                 });
@@ -181,7 +180,7 @@ namespace BlazorApp.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TypeVehicule1")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -403,21 +402,21 @@ namespace BlazorApp.Migrations
 
             modelBuilder.Entity("BlazorApp.Models.Domain.Reservation", b =>
                 {
-                    b.HasOne("BlazorApp.Models.Domain.Client", "ClientNavigation")
+                    b.HasOne("BlazorApp.Models.Domain.Client", "Client")
                         .WithMany("Reservations")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BlazorApp.Models.Domain.Vehicule", "VehiculeNavigation")
+                    b.HasOne("BlazorApp.Models.Domain.Vehicule", "Vehicule")
                         .WithMany("Reservations")
-                        .HasForeignKey("IdVehicule")
+                        .HasForeignKey("VehiculeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ClientNavigation");
+                    b.Navigation("Client");
 
-                    b.Navigation("VehiculeNavigation");
+                    b.Navigation("Vehicule");
                 });
 
             modelBuilder.Entity("BlazorApp.Models.Domain.UtilisationVehicule", b =>
