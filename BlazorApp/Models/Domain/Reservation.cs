@@ -1,16 +1,18 @@
-﻿namespace BlazorApp.Models.Domain;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BlazorApp.Models.Domain;
 
 public class Reservation
 {
     public int Vehicule { get; set; }
 
-    public int Client { get; set; }
-
     public DateTime DateReservation { get; set; }
 
     public DateTime? DateEcheance { get; set; }
-
+    
+    [ForeignKey("Id")]
     public virtual Client ClientNavigation { get; set; } = null!;
-
+    
+    [ForeignKey("IdVehicule")]
     public virtual Vehicule VehiculeNavigation { get; set; } = null!;
 }

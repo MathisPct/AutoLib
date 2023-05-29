@@ -1,8 +1,11 @@
-﻿@page "/login"
+﻿@page "/Login"
 @using BlazorApp.Dto
-@using BlazorApp.Services
-@inject AuthentificationService AuthService
+@using BlazorApp.Middleware
+@using BlazorApp.Models.Domain
+@using Microsoft.AspNetCore.Identity
 @inject NavigationManager NavigationManager
+@inject SignInManager<Client> SignInManager
+@inject UserManager<Client> UserManager
 
 <h1>Se connecter</h1>
 
@@ -35,8 +38,25 @@
     {
         try
         {
-            var connectedUser = await AuthService.Login(_loginData, CancellationToken.None);
-            NavigationManager.NavigateTo("/");
+            var user = await UserManager.FindByEmailAsync(_loginData.Email) ?? throw new Exception("User pas trouvé");
+            if (await SignInManager.CanSignInAsync(user))
+            {
+                var result = await SignInManager.CheckPasswordSignInAsync(user, _loginData.Password, false);
+                if (result.Succeeded)
+                {
+                    Guid key = Guid.NewGuid();
+                    BlazorCookieLoginMiddleware.Logins[key] = new LoginInfo { Email = _loginData.Email, Password = _loginData.Password };
+                    NavigationManager.NavigateTo($"/login?key={key}", true);
+                }
+                else
+                {
+                    _errorMessage = "Mot de passe incorrect";
+                }
+            }
+            else
+            {
+                _errorMessage = "Votre compte est bloqué";
+            }
         }
         catch (Exception ex)
         {

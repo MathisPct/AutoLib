@@ -1,7 +1,10 @@
-﻿namespace BlazorApp.Models.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlazorApp.Models.Domain;
 
 public partial class TypeVehicule
 {
+    [Key]
     public int IdTypeVehicule { get; set; }
 
     public string Categorie { get; set; } = null!;

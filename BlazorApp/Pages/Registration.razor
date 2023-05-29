@@ -1,8 +1,9 @@
 ﻿@page "/register"
-@using BlazorApp.Services
 @using BlazorApp.Dto
-@inject AuthentificationService AuthService
+@using BlazorApp.Models.Domain
+@using Microsoft.AspNetCore.Identity
 @inject NavigationManager NavigationManager
+@inject UserManager<Client> UserManager
 
 <h1>S'enregistrer</h1>
 <EditForm Model="@_userRegistration" OnValidSubmit="HandleValidSubmit">
@@ -49,9 +50,16 @@
     {
         try
         {
-            var newUser = await AuthService.Register(_userRegistration, CancellationToken.None);
-            // Handle successful registration, e.g. redirect to the homepage or login page
-            NavigationManager.NavigateTo("/");
+            var user = new Client()
+            {
+                UserName = _userRegistration.Prenom,
+                Prenom = _userRegistration.Prenom,
+                Nom = _userRegistration.Nom,
+                DateNaissance = _userRegistration.DateNaissance,
+                Email = _userRegistration.Prenom
+            };
+            var newUser = await UserManager.CreateAsync(user, _userRegistration.Password);
+            NavigationManager.NavigateTo("/login");
         }
         catch (Exception ex)
         {
