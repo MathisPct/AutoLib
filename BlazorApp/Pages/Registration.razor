@@ -7,30 +7,36 @@
 
 <h1>S'enregistrer</h1>
 <EditForm Model="@_userRegistration" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+    <DataAnnotationsValidator/>
 
     <div class="form-group">
         <label for="Prenom">Prénom: </label>
-        <InputText id="Prenom" class="form-control" @bind-Value="_userRegistration.Prenom" />
-        <ValidationMessage For="@(() => _userRegistration.Prenom)" />
+        <InputText id="Prenom" class="form-control" @bind-Value="_userRegistration.Prenom"/>
+        <ValidationMessage For="@(() => _userRegistration.Prenom)"/>
     </div>
 
     <div class="form-group">
         <label for="Nom">Nom: </label>
-        <InputText id="Nom" class="form-control" @bind-Value="_userRegistration.Nom" />
-        <ValidationMessage For="@(() => _userRegistration.Nom)" />
+        <InputText id="Nom" class="form-control" @bind-Value="_userRegistration.Nom"/>
+        <ValidationMessage For="@(() => _userRegistration.Nom)"/>
     </div>
 
     <div class="form-group">
         <label for="DateNaissance">Date d'anniversaire</label>
-        <InputDate id="DateNaissance" class="form-control" @bind-Value="_userRegistration.DateNaissance" />
-        <ValidationMessage For="@(() => _userRegistration.DateNaissance)" />
+        <InputDate id="DateNaissance" class="form-control" @bind-Value="_userRegistration.DateNaissance"/>
+        <ValidationMessage For="@(() => _userRegistration.DateNaissance)"/>
     </div>
 
     <div class="form-group">
-        <label for="Password">Password:</label>
-        <InputText type="password" id="Password" class="form-control" @bind-Value="_userRegistration.Password" />
-        <ValidationMessage For="@(() => _userRegistration.Password)" />
+        <label for="Password">Mot de passe</label>
+        <InputText type="password" id="Password" class="form-control" @bind-Value="_userRegistration.Password"/>
+        <ValidationMessage For="@(() => _userRegistration.Password)"/>
+    </div>
+
+    <div class="form-group">
+        <label for="ConfirmPassword">Confirmer votre mot de passe</label>
+        <InputText type="password" id="ConfirmPassword" class="form-control" @bind-Value="_userRegistration.ConfirmPassword"/>
+        <ValidationMessage For="@(() => _userRegistration.ConfirmPassword)"/>
     </div>
 
     <div class="signin-container">
@@ -44,6 +50,17 @@
 
 @code {
     private UserRegistration _userRegistration = new();
+    
+    protected override void OnInitialized()
+    {
+        _userRegistration = new UserRegistration()
+        {
+            MinLengthPassword = UserManager.Options.Password.RequiredLength,
+            RequireNonAlphaNumeric = UserManager.Options.Password.RequireNonAlphanumeric,
+            RequireDigit = UserManager.Options.Password.RequireDigit,
+        };
+    }
+    
     private string _errorMessage;
 
     private async Task HandleValidSubmit()
@@ -58,7 +75,13 @@
                 DateNaissance = _userRegistration.DateNaissance,
                 Email = _userRegistration.Prenom
             };
-            var newUser = await UserManager.CreateAsync(user, _userRegistration.Password);
+            var identityResult = await UserManager.CreateAsync(user, _userRegistration.Password);
+            if (identityResult.Succeeded == false)
+            {
+                foreach (var identityResultError in identityResult.Errors)
+                {
+                }
+            }
             NavigationManager.NavigateTo("/login");
         }
         catch (Exception ex)
