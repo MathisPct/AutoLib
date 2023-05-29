@@ -18,7 +18,8 @@ builder.Services.AddSingleton<ReservationRepository>();
 builder.Services.AddSingleton<ReservationService>();
 
 builder.Services.AddIdentity<Client, IdentityRole>()
-    .AddEntityFrameworkStores<AutolibContext>();
+    .AddEntityFrameworkStores<AutolibContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
