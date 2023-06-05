@@ -2,12 +2,9 @@
 @page "/vehicules"
 @using BlazorApp.Services
 @using BlazorApp.Models.Domain
-@using BlazorApp.Dto
-@using Microsoft.AspNetCore.Identity
 @inject VehiculeService VehiculeService
-@inject ReservationService ReservationService
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject UserManager<Client> UserManager
+@inject IJSRuntime JSRuntime
+@inject IToastService toastService
 
 <h1>Vehicules</h1>
 
@@ -32,7 +29,7 @@
             <td>@(vehicule.EtatBatterie)</td>
             <td>@(vehicule.Disponibilite)</td>
             <td>
-                <button class="btn btn-primary" @onclick="() => Reserver(vehicule)">
+                <button class="btn btn-primary" @onclick="() => OpenReservationModal(vehicule)">
                     Réserver
                 </button>
             </td>
@@ -41,24 +38,21 @@
     </tbody>
 </table>
 
+<ModalReservation SelectedVehicule="SelectedVehicle" ModalId="reservationModal" Title="Réservation" FinishReservation="ConfirmReservation">
+    <p>Voulez-vous réserver le véhicule @SelectedVehicle?.TypeVehiculeNavigation.Name ?</p>
+</ModalReservation>
+
 @code {
+    Vehicule SelectedVehicle { get; set; }
 
-    private async void Reserver(Vehicule vehicule)
+    private async void OpenReservationModal(Vehicule vehicule)
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        if (user.Identity == null || user.Identity.IsAuthenticated == false)
-        {
-            throw new Exception("Vous devez être connecté pour réserver un véhicule");
-        }
-        
-        var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user.Identity.Name) ?? throw new Exception("Vous devez être connecté pour réserver un véhicule");
-
-        ReservationService.Reserver(vehicule, clientConnected, new PlageReservation()
-        {
-            start = DateTime.Now,
-            end = DateTime.Now + TimeSpan.FromDays(1)
-        });
+        SelectedVehicle = vehicule;
+        await JSRuntime.InvokeVoidAsync("blazorHelpers.openModal", "reservationModal");
     }
 
+    private async Task ConfirmReservation()
+    {
+        toastService.ShowSuccess("Réservation effectuée avec succès");
+    }
 }

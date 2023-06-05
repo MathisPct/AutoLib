@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Components
+@using BlazorApp.Dto
+@using BlazorApp.Models.Domain
+@using BlazorApp.Services
+@using Microsoft.AspNetCore.Identity
+@inject IJSRuntime JSRuntime
+@inject ReservationService ReservationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<Client> UserManager
+
+<div class="modal" tabindex="-1" id="@ModalId">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" @onclick="Close"></button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+                
+                <label for="end">Fin:</label>
+                <input type="datetime-local" id="end" name="end" @bind="Plage.end">
+
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <p class="text-danger">@ErrorMessage</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Close">Fermer</button>
+                <button type="button" class="btn btn-primary" @onclick="Confirm">Valider</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Vehicule SelectedVehicule { get; set; }
+    
+    [Parameter]
+    public string ModalId { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback FinishReservation { get; set; }
+    
+    public PlageReservation Plage { get; init; } = new PlageReservation();
+    public string ErrorMessage { get; set; }
+
+    public async Task Close()
+    {
+        await JSRuntime.InvokeVoidAsync("blazorHelpers.closeModal", ModalId);
+    }
+    
+    private async Task Confirm()
+    {
+        await Reserver();
+    }
+    
+    private async Task Reserver()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity == null || user.Identity.IsAuthenticated == false)
+        {
+            ErrorMessage = "Vous devez être connecté pour réserver un véhicule";
+            return;
+        }
+        
+        var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user.Identity.Name);
+        if (clientConnected == null)
+        {
+            ErrorMessage = "Vous devez être connecté pour réserver un véhicule";
+            return;
+        }
+
+        try
+        {
+            ReservationService.Reserver(SelectedVehicule, clientConnected, new PlageReservation()
+            {
+                start = Plage.start,
+                end = Plage.end
+            });
+
+            ErrorMessage = string.Empty;
+            await Close();
+            await FinishReservation.InvokeAsync();
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.Message;
+            Console.WriteLine(e);
+        }
+    }
+}

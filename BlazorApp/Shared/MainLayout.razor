@@ -1,6 +1,24 @@
-﻿@inherits LayoutComponentBase
+﻿@using Blazored.Toast.Configuration
+@inherits LayoutComponentBase
 
 <PageTitle>BlazorApp</PageTitle>
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="10"
+                IconType="IconType.Blazored"
+                ErrorIcon="error_outline"
+                InfoIcon="school"
+                SuccessIcon="done_outline"
+                WarningIcon="warning"
+                ShowProgressBar="@true"
+                ShowCloseButton="@true"
+                MaxToastCount="3">
+    <CloseButtonContent>
+        <div>
+            <span class="myCloseButtonStyleClass">&times;</span>
+        </div>
+    </CloseButtonContent>
+</BlazoredToasts>
 
 <div class="page">
     <div class="sidebar">
