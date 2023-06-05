@@ -1,4 +1,5 @@
-﻿@page "/account"
+﻿@attribute [Authorize]
+@page "/account"
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
 @using BlazorApp.Models.Domain

@@ -1,4 +1,5 @@
-﻿@page "/vehicules"
+﻿@attribute [Authorize]
+@page "/vehicules"
 @using BlazorApp.Services
 @using BlazorApp.Models.Domain
 @using BlazorApp.Dto
@@ -8,63 +9,56 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<Client> UserManager
 
-<AuthorizeView>
-    <Authorized>
-        <h1>Vehicules</h1>
-        
-        <table>
-            <thead>
-            <tr>
-                <th>Borne</th>
-                <th>Véhicule</th>
-                <th>Catégorie</th>
-                <th>Batterie</th>
-                <th>Disponibilité</th>
-                <th>Réserver</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (Vehicule vehicule in VehiculeService.VehiculesAReserver())
-            {
-                <tr>
-                    <td>@("inconnu")</td>
-                    <td>@(vehicule.TypeVehiculeNavigation.Name)</td>
-                    <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
-                    <td>@(vehicule.EtatBatterie)</td>
-                    <td>@(vehicule.Disponibilite)</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="() => Reserver(vehicule)">
-                            Réserver
-                        </button>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-        
-        @code {
-        
-            private async void Reserver(Vehicule vehicule)
-            {
-                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                var user = authState.User;
-                if (user.Identity == null || user.Identity.IsAuthenticated == false)
-                {
-                    throw new Exception("Vous devez être connecté pour réserver un véhicule");
-                }
-                
-                var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user.Identity.Name) ?? throw new Exception("Vous devez être connecté pour réserver un véhicule");
+<h1>Vehicules</h1>
 
-                ReservationService.Reserver(vehicule, clientConnected, new PlageReservation()
-                {
-                    start = DateTime.Now,
-                    end = DateTime.Now + TimeSpan.FromDays(1)
-                });
-            }
-        
+<table>
+    <thead>
+    <tr>
+        <th>Borne</th>
+        <th>Véhicule</th>
+        <th>Catégorie</th>
+        <th>Batterie</th>
+        <th>Disponibilité</th>
+        <th>Réserver</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (Vehicule vehicule in VehiculeService.VehiculesAReserver())
+    {
+        <tr>
+            <td>@("inconnu")</td>
+            <td>@(vehicule.TypeVehiculeNavigation.Name)</td>
+            <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
+            <td>@(vehicule.EtatBatterie)</td>
+            <td>@(vehicule.Disponibilite)</td>
+            <td>
+                <button class="btn btn-primary" @onclick="() => Reserver(vehicule)">
+                    Réserver
+                </button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+
+    private async void Reserver(Vehicule vehicule)
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity == null || user.Identity.IsAuthenticated == false)
+        {
+            throw new Exception("Vous devez être connecté pour réserver un véhicule");
         }
-    </Authorized>
-    <NotAuthorized>
-        <p>Veuillez vous connecter pour voir ce contenu.</p>
-    </NotAuthorized>
-</AuthorizeView>
+        
+        var clientConnected = UserManager.Users.FirstOrDefault(u => u.Email == user.Identity.Name) ?? throw new Exception("Vous devez être connecté pour réserver un véhicule");
+
+        ReservationService.Reserver(vehicule, clientConnected, new PlageReservation()
+        {
+            start = DateTime.Now,
+            end = DateTime.Now + TimeSpan.FromDays(1)
+        });
+    }
+
+}

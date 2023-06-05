@@ -1,11 +1,4 @@
-﻿@page "/"
+﻿@attribute [Authorize]
+@page "/"
 
-<AuthorizeView>
-    <Authorized>
-        <p>Bonjour, @context.User.Identity.Name!</p>
-        <StationsMap></StationsMap>
-    </Authorized>
-    <NotAuthorized>
-        <p>Veuillez vous connecter pour voir ce contenu.</p>
-    </NotAuthorized>
-</AuthorizeView>
+<StationsMap></StationsMap>

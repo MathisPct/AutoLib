@@ -1,4 +1,5 @@
-﻿@page "/myreservation"
+﻿@attribute [Authorize]
+@page "/myreservation"
 @using BlazorApp.Services
 @using Microsoft.AspNetCore.Identity
 @using BlazorApp.Models.Domain
@@ -43,8 +44,9 @@ else
         try
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-            var clientConnected = UserManager.Users.FirstOrDefault(u => u.UserName == user.Identity.Name) ?? throw new Exception("Vous devez être connectée");
+            var userIdentity = authState.User.Identity ?? throw new Exception("Vous n'êtes pas connecté");
+            var clientConnected = UserManager.Users.FirstOrDefault(u => u.UserName == userIdentity.Name);
+            if(clientConnected == null) throw new Exception("Vous n'êtes pas connecté");
             this._reservations = ReservationService.Reservations(clientConnected);
         }
         catch (Exception e)
