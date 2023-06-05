@@ -1,0 +1,12 @@
+﻿.map-container > * {
+    box-sizing: border-box;
+}
+
+.map-container {
+    padding: 16px;
+}
+
+.map-leaflet {
+    height: calc(100vh - calc(64px + 72px + 32px));
+    width: 100%;
+}
