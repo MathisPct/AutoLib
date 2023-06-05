@@ -18,6 +18,14 @@
     top: -2px;
 }
 
+.authorize-nav-elements {
+    min-height: calc(100vh - 56px);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .nav-item {
     font-size: 0.9rem;
     padding-bottom: 0.5rem;
