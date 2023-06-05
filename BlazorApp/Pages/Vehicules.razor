@@ -26,7 +26,7 @@
     @foreach (Vehicule vehicule in VehiculeService.VehiculesAReserver())
     {
         <tr>
-            <td>@("inconnu")</td>
+            <td>@(vehicule.Bornes.ToArray()[0].IdBorne)</td>
             <td>@(vehicule.TypeVehiculeNavigation.Name)</td>
             <td>@(vehicule.TypeVehiculeNavigation.Categorie)</td>
             <td>@(vehicule.EtatBatterie)</td>
