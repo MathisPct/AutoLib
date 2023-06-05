@@ -14,19 +14,26 @@ a, .btn-link {
 
 table {
     width: 100%;
-    border: solid black 1px;
 }
 
 thead tr {
     background: linear-gradient(90deg, rgb(242 242 242) 95%, #fdfdfd);
 }
 
+thead tr th {
+    text-transform: uppercase;
+}
+
 tbody tr:not(:last-child) {
-    border-bottom: 2px solid #0f1121;
+    border-bottom: 1px solid #f2f2f2;
 }
 
 td, th {
-    padding: 15px;
+    padding: 24px;
+}
+
+td {
+    color: #999;
 }
 
 .btn-primary {
