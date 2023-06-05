@@ -7,6 +7,7 @@
 }
 
 .map-leaflet {
+    border-radius: 8px;
     height: calc(100vh - calc(64px + 72px + 32px));
     width: 100%;
 }
