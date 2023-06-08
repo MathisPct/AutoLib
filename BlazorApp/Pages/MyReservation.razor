@@ -13,6 +13,7 @@
 {
     <table>
         <thead>
+        <th>Date de début</th>
         <th>Date échéance</th>
         <th>Véhicule</th>
         </thead>
@@ -21,6 +22,7 @@
         @foreach (var reservation in _reservations)
         {
             <tr>
+                <td>@reservation.DateReservation</td>
                 <td>@reservation.DateEcheance</td>
                 <td>@reservation.Vehicule.TypeVehiculeNavigation.Name</td>
             </tr>
